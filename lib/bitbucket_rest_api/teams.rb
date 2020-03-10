@@ -80,7 +80,7 @@ module BitBucket
       path = "/2.0/repositories/#{team_name.to_s}"
       result = nil
       while true
-        response = get_request(path, params)
+        response = get_request(path)
         # init result if result was nil or add to the result
         result.nil? ? result = response["values"] : result += response["values"]
         break unless response["next"]
