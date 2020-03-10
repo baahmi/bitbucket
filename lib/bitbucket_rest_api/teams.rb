@@ -77,9 +77,18 @@ module BitBucket
     #   bitbucket.teams.repos(:team_name_here)
     #   bitbucket.teams.repos(:team_name_here) { |repo| ... }
     def repos(team_name)
-      response = get_request("/2.0/repositories/#{team_name.to_s}")
-      return response["values"] unless block_given?
-      response["values"].each { |el| yield el }
+      path = "/2.0/repositories/#{team_name.to_s}"
+      result = nil
+      while true
+        response = get_request(path, params)
+        # init result if result was nil or add to the result
+        result.nil? ? result = response["values"] : result += response["values"]
+        break unless response["next"]
+        # contains an url to the next
+        path = response["next"]
+      end
+      return result unless block_given?
+      result.each { |el| yield el }
     end
 
     alias :repositories :repos
